@@ -3,7 +3,7 @@
 *~
 
 /data/
-/litecoin_scrypt/build/
+/neoscrypt/build/
 /_trial_temp*
 Makefile.local
 .cache/
@@ -11,4 +11,4 @@ Makefile.local
 .pyenv/
 .coverage
 build/
-ltc_scrypt.so
+neoscrypt.so

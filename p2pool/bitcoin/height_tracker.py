@@ -89,13 +89,13 @@ class HeightTracker(object):
         return height - best_height
 
 @defer.inlineCallbacks
-def get_height_rel_highest_func(bitcoind, factory, best_block_func, net):
-    if '\ngetblock ' in (yield deferral.retry()(bitcoind.rpc_help)()):
+def get_height_rel_highest_func(daemon, factory, best_block_func, net):
+    if '\ngetblock ' in (yield deferral.retry()(daemon.rpc_help)()):
         @deferral.DeferredCacher
         @defer.inlineCallbacks
         def height_cacher(block_hash):
             try:
-                x = yield bitcoind.rpc_getblock('%x' % (block_hash,))
+                x = yield daemon.rpc_getblock('%x' % (block_hash,))
             except jsonrpc.Error_for_code(-5): # Block not found
                 if not p2pool.DEBUG:
                     raise deferral.RetrySilentlyException()

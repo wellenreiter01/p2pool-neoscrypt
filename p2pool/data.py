@@ -71,7 +71,8 @@ def load_share(share, net, peer_addr):
     else:
         raise ValueError('unknown share type: %r' % (share['type'],))
 
-DONATION_SCRIPT = '4104ffd03de44a6e11b9917f3a29f9443283d9871c9d743ef30d5eddcd37094b64d1b3d8090496b53256786bf5c82932ec23c3b74d9f05a6f95a8b5529352656664bac'.decode('hex')
+# PtoPXC8MmB5VwfHFNhVTynATLSHLzq5MgF
+DONATION_SCRIPT = '410494803BA564D117067A62408A1D85BCE6B559BE5CC30264CFD266B3196E045DAD09D2CDCBA09A752B6A78B74EC068BDB78C78BD13752639961FC839E9446D3AE8AC'.decode('hex')
 
 class Share(object):
     VERSION = 13
@@ -185,9 +186,9 @@ class Share(object):
         )
         assert total_weight == sum(weights.itervalues()) + donation_weight, (total_weight, sum(weights.itervalues()) + donation_weight)
         
-        amounts = dict((script, share_data['subsidy']*(199*weight)//(200*total_weight)) for script, weight in weights.iteritems()) # 99.5% goes according to weights prior to this share
+        amounts = dict((script, share_data['subsidy']*(49*weight)//(50*total_weight)) for script, weight in weights.iteritems()) # 98% goes according to weights prior to this share
         this_script = bitcoin_data.pubkey_hash_to_script2(share_data['pubkey_hash'])
-        amounts[this_script] = amounts.get(this_script, 0) + share_data['subsidy']//200 # 0.5% goes to block finder
+        amounts[this_script] = amounts.get(this_script, 0) + share_data['subsidy']//50 # 2% goes to block finder
         amounts[DONATION_SCRIPT] = amounts.get(DONATION_SCRIPT, 0) + share_data['subsidy'] - sum(amounts.itervalues()) # all that's left over is the donation weight and some extra satoshis due to rounding
         
         if sum(amounts.itervalues()) != share_data['subsidy'] or any(x < 0 for x in amounts.itervalues()):
@@ -622,7 +623,7 @@ def get_desired_version_counts(tracker, best_share_hash, dist):
         res[share.desired_version] = res.get(share.desired_version, 0) + bitcoin_data.target_to_average_attempts(share.target)
     return res
 
-def get_warnings(tracker, best_share, net, bitcoind_getinfo, bitcoind_work_value):
+def get_warnings(tracker, best_share, net, daemon_getinfo, daemon_work_value):
     res = []
     
     desired_version_counts = get_desired_version_counts(tracker, best_share,
@@ -633,16 +634,16 @@ def get_warnings(tracker, best_share, net, bitcoind_getinfo, bitcoind_work_value
             'An upgrade is likely necessary. Check http://p2pool.forre.st/ for more information.' % (
                 majority_desired_version, 100*desired_version_counts[majority_desired_version]/sum(desired_version_counts.itervalues())))
     
-    if bitcoind_getinfo['errors'] != '':
-        if 'This is a pre-release test build' not in bitcoind_getinfo['errors']:
-            res.append('(from bitcoind) %s' % (bitcoind_getinfo['errors'],))
+    if daemon_getinfo['errors'] != '':
+        if 'This is a pre-release test build' not in daemon_getinfo['errors']:
+            res.append('(from daemon) %s' % (daemon_getinfo['errors'],))
     
-    version_warning = getattr(net, 'VERSION_WARNING', lambda v: None)(bitcoind_getinfo['version'])
+    version_warning = getattr(net, 'VERSION_WARNING', lambda v: None)(daemon_getinfo['version'])
     if version_warning is not None:
         res.append(version_warning)
     
-    if time.time() > bitcoind_work_value['last_update'] + 60:
-        res.append('''LOST CONTACT WITH BITCOIND for %s! Check that it isn't frozen or dead!''' % (math.format_dt(time.time() - bitcoind_work_value['last_update']),))
+    if time.time() > daemon_work_value['last_update'] + 60:
+        res.append('''LOST CONTACT WITH THE DAEMON for %s!''' % (math.format_dt(time.time() - daemon_work_value['last_update']),))
     
     return res
 
