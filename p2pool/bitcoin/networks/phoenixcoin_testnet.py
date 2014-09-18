@@ -21,6 +21,6 @@ CONF_FILE_FUNC = lambda: os.path.join(os.path.join(os.getcwd(), 'data') if platf
 BLOCK_EXPLORER_URL_PREFIX = 'http://explorer.phoenixcoin.org:3080/block/'
 ADDRESS_EXPLORER_URL_PREFIX = 'http://explorer.phoenixcoin.org:3080/address/'
 TX_EXPLORER_URL_PREFIX = 'http://explorer.phoenixcoin.org:3080/tx/'
-SANE_TARGET_RANGE = (2**256//1000000000 - 1, 2**256//10000 - 1)
+SANE_TARGET_RANGE = (2**256 - 1 >> 30, 2**256 - 1 >> 12)
 DUMB_SCRYPT_DIFF = 2**16
 DUST_THRESHOLD = 0.1e8
