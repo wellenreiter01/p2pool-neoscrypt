@@ -8,7 +8,9 @@ from . import data as bitcoin_data
 from . import sha256
 from p2pool.util import pack
 
-def _swap4(s):
+def _swap4(s, flag = False):
+    if not flag:
+      return s
     if len(s) % 4:
         raise ValueError()
     return ''.join(s[x:x+4][::-1] for x in xrange(0, len(s), 4))
@@ -32,7 +34,7 @@ class BlockAttempt(object):
         return 'BlockAttempt(%s)' % (', '.join('%s=%r' % (k, v) for k, v in self.__dict__.iteritems()),)
     
     def getwork(self, **extra):
-        if 'data' in extra:
+        if 'data' in extra or 'hash1' in extra or 'target' in extra or 'midstate' in extra:
             raise ValueError()
         
         block_data = bitcoin_data.block_header_type.pack(dict(
@@ -43,28 +45,31 @@ class BlockAttempt(object):
             bits=self.bits,
             nonce=0,
         ))
+
         
         getwork = {
-            'data': block_data.encode('hex'), 
-            'target': pack.IntType(256, 'little').pack(self.share_target).encode('hex'),
+            'data': block_data.encode('hex') + '000000800000000000000000000000000000000000000000000000000000000000000000000000000000000080020000',
+            'hash1': '00000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000010000',
+            'target': pack.IntType(256).pack(self.share_target).encode('hex'),
+            'midstate': sha256.process(sha256.initial_state, block_data[:64]).encode('hex'),
         }
         
         getwork = dict(getwork)
         getwork.update(extra)
-        
         return getwork
     
     @classmethod
     def from_getwork(cls, getwork):
         attrs = decode_data(getwork['data'])
+       
         
         return cls(
             version=attrs['version'],
             previous_block=attrs['previous_block'],
-            merkle_root=attrs['merkle_root'],
+            merkle_root=_swap4(attrs['merkle_root'],True),
             timestamp=attrs['timestamp'],
             bits=attrs['bits'],
-            share_target=pack.IntType(256, 'little').unpack(getwork['target'].decode('hex')),
+            share_target=pack.IntType(256).unpack(getwork['target'].decode('hex')),
         )
     
     def update(self, **kwargs):

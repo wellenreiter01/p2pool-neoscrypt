@@ -416,6 +416,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
 
             if pow_hash > target:
                 print 'Worker %s submitted share with hash > target:' % (user,)
+                raise jsonrpc.Error_for_code(-1)(u'Hash > Target')
             elif header_hash in received_header_hashes:
                 print >>sys.stderr, 'Worker %s submitted share more than once!' % (user,)
             else:

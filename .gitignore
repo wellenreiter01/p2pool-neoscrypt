@@ -1,7 +1,10 @@
 *.pyc
 *.pyo
 *~
-
+# temp file from vi
+*-swp
+# start scripts
+start_*
 /data/
 /neoscrypt/build/
 /_trial_temp*
