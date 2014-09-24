@@ -55,13 +55,13 @@ class StratumRPCMiningProvider(object):
         # this is send to the miner in the stratum message
         self.other.svc_mining.rpc_notify(
             jobid, # jobid
-            getwork._swap4(pack.IntType(256).pack(x['previous_block'])).encode('hex'), # prevhash
+            getwork._swap4(pack.IntType(256).pack(x['previous_block']),True).encode('hex'), # prevhash
             x['coinb1'].encode('hex'), # coinb1
             x['coinb2'].encode('hex'), # coinb2
             [pack.IntType(256).pack(s).encode('hex') for s in x['merkle_link']['branch']], # merkle_branch
             getwork._swap4(pack.IntType(32).pack(x['version']),True).encode('hex'), # version
-           # getwork._swap4(pack.IntType(32).pack(x['bits'].bits),True).encode('hex'), # nbits
-             pack.IntType(32).pack(x['bits'].bits).encode('hex'), # nbits
+            getwork._swap4(pack.IntType(32).pack(x['bits'].bits),True).encode('hex'), # nbits
+           #  pack.IntType(32).pack(x['bits'].bits).encode('hex'), # nbits
             getwork._swap4(pack.IntType(32).pack(x['timestamp']),True).encode('hex'), # ntime
             True, # clean_jobs
         ).addErrback(lambda err: None)
@@ -75,7 +75,7 @@ class StratumRPCMiningProvider(object):
             return False
         x, got_response = self.handler_map[job_id]
         
-        coinb_nonce = getwork._swap4(extranonce2.decode('hex'),True)       
+        coinb_nonce = getwork._swap4(extranonce2.decode('hex'))       
         assert len(coinb_nonce) == self.wb.COINBASE_NONCE_LENGTH
         new_packed_gentx = x['coinb1'] + coinb_nonce + x['coinb2']
         
@@ -89,8 +89,8 @@ class StratumRPCMiningProvider(object):
             nonce=pack.IntType(32).unpack(getwork._swap4(nonce.decode('hex'),True)),
 
         )
-	#if p2pool.DEBUG:
-	#    print "stratum: nonce %s:%s extranonce2: %s" %(nonce, type(nonce), extranonce2)
+	
+	#print "stratum: nonce %s extranonce2: %s" %(nonce,  extranonce2)
 	#    print "stratum: header:%s\n" % (str(header))
 	#    print "stratum: merkle_root %s" % (hex(header['merkle_root']))
 	#    print "stratum: merkle_link %s" % (repr(x['merkle_link']))
