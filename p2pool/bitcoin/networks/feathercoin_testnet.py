@@ -11,7 +11,7 @@ P2P_PORT = 19336
 ADDRESS_VERSION = 65
 RPC_PORT = 19337
 RPC_CHECK = defer.inlineCallbacks(lambda daemon: defer.returnValue(
-  'phoenixcoinaddress' in (yield daemon.rpc_help()) and
+  'feathercoinaddress' in (yield daemon.rpc_help()) and
   (yield daemon.rpc_getinfo())['testnet']))
 SUBSIDY_FUNC = lambda height: 50*100000000 >> (height + 1)//840000
 POW_FUNC = lambda data: pack.IntType(256).unpack(__import__('neoscrypt').getPoWHash(data))
