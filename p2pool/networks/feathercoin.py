@@ -19,7 +19,7 @@ MIN_TARGET = 0
 MAX_TARGET = 2**256//2**20 - 1
 PERSIST = False
 WORKER_PORT = 19327
-BOOTSTRAP_ADDRS = 'pool.maeh.org pool2.maeh.org'.split(' ')
+BOOTSTRAP_ADDRS = 'p2pool.neoscrypt.de pool.maeh.org pool2.maeh.org'.split(' ')
 ANNOUNCE_CHANNEL = '#p2pool-ftc'
 VERSION_CHECK = lambda v: True
-VERSION_WARNING = lambda v: 'Upgrade Feathercoin to >= 0.8.6.0!' if v < 80600 else None
+VERSION_WARNING = lambda v: 'Upgrade Feathercoin to >= 0.8.7.0!' if v < 80700 else None

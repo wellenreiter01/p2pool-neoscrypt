@@ -16,4 +16,4 @@ WORKER_PORT = 19328
 BOOTSTRAP_ADDRS = ''.split(' ')
 ANNOUNCE_CHANNEL = '#p2pool-ftct'
 VERSION_CHECK = lambda v: True
-VERSION_WARNING = lambda v: 'Upgrade Feathercoin to >= 0.8.6.0!' if v < 80600 else None
+VERSION_WARNING = lambda v: 'Upgrade Feathercoin to >= 0.8.7.0!' if v < 80700 else None
