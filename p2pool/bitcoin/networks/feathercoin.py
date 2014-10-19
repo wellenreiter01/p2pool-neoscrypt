@@ -7,9 +7,9 @@ from .. import data, helper
 from p2pool.util import pack
 
 P2P_PREFIX = 'FBC0B6DB'.decode('hex')
-P2P_PORT = 9555
+P2P_PORT = 9336
 ADDRESS_VERSION = 14
-RPC_PORT = 9554
+RPC_PORT = 9337
 RPC_CHECK = defer.inlineCallbacks(lambda daemon: defer.returnValue(
   'feathercoinaddress' in (yield daemon.rpc_help()) and
   not (yield daemon.rpc_getinfo())['testnet']))
