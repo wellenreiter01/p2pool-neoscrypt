@@ -1,7 +1,7 @@
 from p2pool.bitcoin import networks
 
 PARENT = networks.nets['feathercoin_testnet']
-SHARE_PERIOD = 30  # seconds
+SHARE_PERIOD = 60  # seconds
 CHAIN_LENGTH = 60*60//10  # shares
 REAL_CHAIN_LENGTH = 60*60//10  # shares
 TARGET_LOOKBEHIND = 200  # shares
