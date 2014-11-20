@@ -19,8 +19,8 @@ BLOCK_PERIOD = 60
 SYMBOL = 'FTC'
 CONF_FILE_FUNC = lambda: os.path.join(os.path.join(os.environ['APPDATA'], 'Feathercoin') if platform.system() == 'Windows' else os.path.expanduser('~/Library/Application Support/Feathercoin/') if platform.system() == 'Darwin' else os.path.expanduser('~/.feathercoin'), 'feathercoin.conf')
 BLOCK_EXPLORER_URL_PREFIX = 'http://explorer.feathercoin.com/block/'
-ADDRESS_EXPLORER_URL_PREFIX = 'http://explorer.feathercoin.org/address/'
-TX_EXPLORER_URL_PREFIX = 'http://explorer.feathercoin.org/tx/'
+ADDRESS_EXPLORER_URL_PREFIX = 'http://explorer.feathercoin.com/address/'
+TX_EXPLORER_URL_PREFIX = 'http://explorer.feathercoin.com/tx/'
 SANE_TARGET_RANGE = (2**256//1000000000 - 1, 2**256//10000 - 1)
 DUMB_SCRYPT_DIFF = 2**16
 DUST_THRESHOLD = 0.03e8
