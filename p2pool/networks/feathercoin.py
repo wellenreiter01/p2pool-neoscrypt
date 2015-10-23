@@ -22,4 +22,5 @@ WORKER_PORT = 19327
 BOOTSTRAP_ADDRS = 'p2pool.neoscrypt.de pool.maeh.org pool2.maeh.org'.split(' ')
 ANNOUNCE_CHANNEL = '#p2pool-ftc'
 VERSION_CHECK = lambda v: True
-VERSION_WARNING = lambda v: 'Upgrade Feathercoin to >= 0.8.7.0!' if v < 80700 else None
+VERSION_WARNING = lambda v: 'Upgrade Feathercoin to >= 0.8.7.1!' if v < 80700 else None
+  

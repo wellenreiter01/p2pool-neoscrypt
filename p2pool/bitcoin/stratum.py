@@ -68,7 +68,7 @@ class StratumRPCMiningProvider(object):
 	
         self.handler_map[jobid] = x, got_response
     
-    #handle infromation commming from miner
+    #handle information commming from miner
     def rpc_submit(self, worker_name, job_id, extranonce2, ntime, nonce):
         if job_id not in self.handler_map:
             print >>sys.stderr, '''Couldn't link returned work's job id with its handler. This should only happen if this process was recently restarted!'''
