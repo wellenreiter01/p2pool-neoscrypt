@@ -44,7 +44,7 @@ Alternate web front end :
 
 Notes for Srypt/NeoScrypt based coins:
 =========================
-Requirementsor:
+Requirements:
 -------------------------
 In order to use P2Pool with any Srypt/NeoScrypt powered coin, you need to build
 and install the Scrypt and/or NeoScrypt Python module first.
