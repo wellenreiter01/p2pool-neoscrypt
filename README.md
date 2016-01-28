@@ -42,7 +42,7 @@ Alternate web front end :
 -------------------------
 * https://github.com/hardcpp/P2PoolExtendedFrontEnd
 
-Notes for Srypt/NeoScrypt based coins:
+Notes for Srcypt/NeoScrypt based coins:
 =========================
 Requirements:
 -------------------------
