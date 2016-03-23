@@ -397,7 +397,7 @@ class NewShare(object):
 
 class Share(object):
     VERSION = 13
-    VOTING_VERSION = 14
+    VOTING_VERSION = 13
     SUCCESSOR = NewShare
     
     small_block_header_type = pack.ComposedType([
