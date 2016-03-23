@@ -12,8 +12,7 @@ MIN_TARGET = 0
 ADDRESS_VERSION = 65
 RPC_PORT = 19337
 RPC_CHECK = defer.inlineCallbacks(lambda bitcoind: defer.returnValue(
-  'feathercoinaddress' in (yield bitcoind.rpc_help()) and
-  not (yield bitcoind.rpc_getinfo())['testnet']))
+  'feathercoinaddress' in (yield bitcoind.rpc_help()) and (yield bitcoind.rpc_getinfo())['testnet']))
 SUBSIDY_FUNC = lambda height: 200*100000000 >> (height + 1)//840000
 POW_FUNC = lambda data: pack.IntType(256).unpack(__import__('neoscrypt').getPoWHash(data))
 BLOCK_PERIOD = 60
