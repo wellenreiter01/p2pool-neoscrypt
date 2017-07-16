@@ -77,7 +77,7 @@ DONATION_SCRIPT = '410494803BA564D117067A62408A1D85BCE6B559BE5CC30264CFD266B3196
 
 class NewShare(object):
     VERSION = 15
-    VOTING_VERSION = 15
+    VOTING_VERSION = 13
     SUCCESSOR = None
     
     small_block_header_type = pack.ComposedType([
@@ -957,7 +957,7 @@ def get_warnings(tracker, best_share, net, bitcoind_getinfo, bitcoind_work_value
     
     if bitcoind_getinfo['errors'] != '':
         if 'This is a pre-release test build' not in bitcoind_getinfo['errors']:
-            res.append('(from bitcoind) %s' % (bitcoind_getinfo['errors'],))
+            res.append('(from daemon) %s' % (bitcoind_getinfo['errors'],))
     
     version_warning = getattr(net, 'VERSION_WARNING', lambda v: None)(bitcoind_getinfo['version'])
     if version_warning is not None:
