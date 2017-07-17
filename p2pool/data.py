@@ -396,7 +396,7 @@ class NewShare(object):
         return dict(header=self.header, txs=[self.check(tracker)] + other_txs)
 
 class Share(object):
-    VERSION = 13
+    VERSION = 15
     VOTING_VERSION = 13
     SUCCESSOR = NewShare
     
