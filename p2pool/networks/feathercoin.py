@@ -22,5 +22,5 @@ WORKER_PORT = 19327
 BOOTSTRAP_ADDRS = 'p2pool.neoscrypt.de 104.236.34.9'.split(' ')
 ANNOUNCE_CHANNEL = '#p2pool-ftc'
 VERSION_CHECK = lambda v: True
-VERSION_WARNING = lambda v:None
+VERSION_WARNING = lambda v: None
 MINIMUM_PROTOCOL_VERSION = 13
