@@ -964,7 +964,7 @@ def get_warnings(tracker, best_share, net, bitcoind_getinfo, bitcoind_work_value
         res.append(version_warning)
     
     if time.time() > bitcoind_work_value['last_update'] + 60:
-        res.append('''LOST CONTACT WITH BITCOIND for %s! Check that it isn't frozen or dead!''' % (math.format_dt(time.time() - bitcoind_work_value['last_update']),))
+        res.append('''LOST CONTACT WITH COINDAEMON for %s! Check that it isn't frozen or dead!''' % (math.format_dt(time.time() - bitcoind_work_value['last_update']),))
     
     return res
 
