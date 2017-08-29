@@ -257,6 +257,10 @@
       fetchGraph(graphPeriod);
     });
 
+    function jq( myid ) {
+      return "#" + myid.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
+    }
+
     // Fills the list of active miners on this node.  I know, there are
     // zillions of people out there on p2pool.  But I'm typically only
     // interested to see, who is mining on my node.
@@ -308,7 +312,7 @@
           tr.append($('<td/>').attr('class', 'text-right')
             .append($('<i/>').append('no shares yet')));
         }
-        $('#'+address).remove(); $('#active_miners').append(tr);
+        $(jq(address)).remove(); $('#active_miners').append(tr);
       });
 
       if(local_doa_hashrate !== 0 && local_hashrate !== 0) {
