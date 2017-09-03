@@ -77,7 +77,7 @@ DONATION_SCRIPT = '410494803BA564D117067A62408A1D85BCE6B559BE5CC30264CFD266B3196
 
 class NewShare(object):
     VERSION = 15
-    VOTING_VERSION = 13
+    VOTING_VERSION = 15
     SUCCESSOR = None
     
     small_block_header_type = pack.ComposedType([
@@ -397,7 +397,7 @@ class NewShare(object):
 
 class Share(object):
     VERSION = 15
-    VOTING_VERSION = 13
+    VOTING_VERSION = 15
     SUCCESSOR = NewShare
     
     small_block_header_type = pack.ComposedType([
