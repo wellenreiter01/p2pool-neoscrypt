@@ -186,7 +186,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
                 except:
                     if p2pool.DEBUG:
                         log.err()
-# ======
+# ====== Adaptive
         set_adaptive_target = (self.diff_policy == 'F') or ((self.diff_policy == 'D') and (desired_share_target is None))
         set_adaptive_pseudo = (self.diff_policy == 'F') or ((self.diff_policy == 'D') and (desired_pseudoshare_target is None))
         user_rate = None
@@ -222,7 +222,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
     
         if desired_share_target is None:
             desired_share_target = 2**265 - 1
-# ======
+# ====== /adaptive
 
         if self.args.address == 'dynamic':
             i = self.pubkeys.weighted()
