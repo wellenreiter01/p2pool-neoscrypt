@@ -396,8 +396,8 @@ class NewShare(object):
         return dict(header=self.header, txs=[self.check(tracker)] + other_txs)
 
 class Share(object):
-    VERSION = 15
-    VOTING_VERSION = 15
+    VERSION = 13
+    VOTING_VERSION = 13
     SUCCESSOR = NewShare
     
     small_block_header_type = pack.ComposedType([
@@ -957,14 +957,14 @@ def get_warnings(tracker, best_share, net, bitcoind_getinfo, bitcoind_work_value
     
     if bitcoind_getinfo['errors'] != '':
         if 'This is a pre-release test build' not in bitcoind_getinfo['errors']:
-            res.append('(from daemon) %s' % (bitcoind_getinfo['errors'],))
+            res.append('(from bitcoind) %s' % (bitcoind_getinfo['errors'],))
     
     version_warning = getattr(net, 'VERSION_WARNING', lambda v: None)(bitcoind_getinfo['version'])
     if version_warning is not None:
         res.append(version_warning)
     
     if time.time() > bitcoind_work_value['last_update'] + 60:
-        res.append('''LOST CONTACT WITH COINDAEMON for %s! Check that it isn't frozen or dead!''' % (math.format_dt(time.time() - bitcoind_work_value['last_update']),))
+        res.append('''LOST CONTACT WITH BITCOIND for %s! Check that it isn't frozen or dead!''' % (math.format_dt(time.time() - bitcoind_work_value['last_update']),))
     
     return res
 
