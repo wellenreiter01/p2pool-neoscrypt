@@ -187,8 +187,8 @@ class WorkerBridge(worker_interface.WorkerBridge):
                     if p2pool.DEBUG:
                         log.err()
 # ======
-        set_adaptive_target = (self.diff_policy == 'F') or ((self.diff_policy == 'D') and (desired_share_target is None))
-        set_adaptive_pseudo = (self.diff_policy == 'F') or ((self.diff_policy == 'D') and (desired_pseudoshare_target is None))
+        set_adaptive_target = (self.diff_policy == 'F') or ((self.diff_policy == 'A') and (desired_share_target is None))
+        set_adaptive_pseudo = (self.diff_policy == 'F') or ((self.diff_policy == 'A') and (desired_pseudoshare_target is None))
         user_rate = None
         pool_rate = None
     
@@ -221,7 +221,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
                     desired_pseudoshare_target = 20 * (2**256 // user_rate // (10*60)) # min 20 pseudoshares per 10 minutes
     
         if desired_share_target is None:
-            desired_share_target = 2**265 - 1
+            desired_share_target = 2**256 - 1
 # ======
 
         if self.args.address == 'dynamic':
