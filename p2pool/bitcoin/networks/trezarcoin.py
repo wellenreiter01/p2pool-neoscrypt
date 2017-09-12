@@ -13,7 +13,9 @@ RPC_PORT = 17299
 RPC_CHECK = defer.inlineCallbacks(lambda bitcoind: defer.returnValue(
   'trezarcoin_address' in (yield bitcoind.rpc_help()) and
   not (yield bitcoind.rpc_getinfo())['testnet']))
-SUBSIDY_FUNC = lambda height: 100*400000000 >> (height + 1)//1600000
+
+SUBSIDY_FUNC = lambda height: 100*100000000 >> (height + 1)//1600000
+
 POW_FUNC = lambda data: pack.IntType(256).unpack(__import__('neoscrypt').getPoWHash(data))
 BLOCK_PERIOD = 90
 SYMBOL = 'TZC'
