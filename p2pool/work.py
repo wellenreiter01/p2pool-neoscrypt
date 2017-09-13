@@ -216,22 +216,15 @@ class WorkerBridge(worker_interface.WorkerBridge):
             if user_rate is not None and pool_rate is not None:
                 if user_rate and pool_rate:
                      # min 20 shares per block AND min 20 shares per chain
-                    desired_share_target = 20 * (max(self.node.bitcoind_work.value['bits'].target * pool_rate, 2**256 // (self.node.net.CHAIN_LENGTH * self.node.net.SHARE_PERIOD)) // user_rate)
+                    desired_share_target = int(20 * (max(self.node.bitcoind_work.value['bits'].target * pool_rate, 2**256 // (self.node.net.CHAIN_LENGTH * self.node.net.SHARE_PERIOD)) // user_rate))
     
         if set_adaptive_pseudo:
             desired_pseudoshare_target = None
             if user_rate is not None:
                 if user_rate:
-                    desired_pseudoshare_target = 20 * (2**256 // user_rate // (10*60)) # min 20 pseudoshares per 10 minutes
-    
-        if desired_share_target is None:
-<<<<<<< HEAD
-            desired_share_target = 2**265 - 1
+                    desired_pseudoshare_target = int(20 * (2**256 // user_rate // (10*60))) # min 100 pseudoshares per 10 minutes
+
 # ====== /adaptive
-=======
-            desired_share_target = 2**256 - 1
-# ======
->>>>>>> adaptive
 
         if self.args.address == 'dynamic':
             i = self.pubkeys.weighted()
