@@ -102,10 +102,10 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
         yield helper.check(bitcoind, net)
         temp_work = yield helper.getwork(bitcoind)
         
-        bitcoind_getinfo_var = variable.Variable(None)
+        bitcoind_getnetworkinfo_var = variable.Variable(None)
         @defer.inlineCallbacks
         def poll_warnings():
-            bitcoind_getinfo_var.set((yield deferral.retry('Error while calling getinfo:')(bitcoind.rpc_getinfo)()))
+            bitcoind_getnetworkinfo_var.set((yield deferral.retry('Error1 while calling getinfo:')(bitcoind.rpc_getnetworkinfo)()))
         yield poll_warnings()
         deferral.RobustLoopingCall(poll_warnings).start(20*60)
         
@@ -282,7 +282,7 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
 	
         
         wb = work.WorkerBridge(node, my_pubkey_hash, args.donation_percentage, merged_urls, args.worker_fee, args, pubkeys, bitcoind)
-        web_root = web.get_web_root(wb, datadir_path, bitcoind_getinfo_var)
+        web_root = web.get_web_root(wb, datadir_path, bitcoind_getnetworkinfo_var)
 
         caching_wb = worker_interface.CachingWorkerBridge(wb)
         worker_interface.WorkerInterface(caching_wb).attach_to(web_root, get_handler=lambda request: request.redirect('/static/'))
@@ -412,7 +412,7 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
                             math.format_dt(2**256 / node.bitcoind_work.value['bits'].target / real_att_s),
                         )
                         
-                        for warning in p2pool_data.get_warnings(node.tracker, node.best_share_var.value, net, bitcoind_getinfo_var.value, node.bitcoind_work.value):
+                        for warning in p2pool_data.get_warnings(node.tracker, node.best_share_var.value, net, bitcoind_getnetworkinfo_var.value, node.bitcoind_work.value):
                             print >>sys.stderr, '#'*40
                             print >>sys.stderr, '>>> Warning: ' + warning
                             print >>sys.stderr, '#'*40
