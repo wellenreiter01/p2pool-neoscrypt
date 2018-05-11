@@ -1,3 +1,9 @@
+Version of p2pool for feathercoind version 0.16
+------------------------------------------------
+
+ 
+  
+  
 Requirements:
 -------------------------
 Generic:
