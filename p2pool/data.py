@@ -944,7 +944,7 @@ def get_desired_version_counts(tracker, best_share_hash, dist):
         res[share.desired_version] = res.get(share.desired_version, 0) + bitcoin_data.target_to_average_attempts(share.target)
     return res
 
-def get_warnings(tracker, best_share, net, bitcoind_getinfo, bitcoind_work_value):
+def get_warnings(tracker, best_share, net, bitcoind_getnetworkinfo, bitcoind_work_value):
     res = []
     
     desired_version_counts = get_desired_version_counts(tracker, best_share,
@@ -955,11 +955,11 @@ def get_warnings(tracker, best_share, net, bitcoind_getinfo, bitcoind_work_value
             'An upgrade is likely necessary. Check http://p2pool.forre.st/ for more information.' % (
                 majority_desired_version, 100*desired_version_counts[majority_desired_version]/sum(desired_version_counts.itervalues())))
     
-    if bitcoind_getinfo['errors'] != '':
-        if 'This is a pre-release test build' not in bitcoind_getinfo['errors']:
-            res.append('(from bitcoind) %s' % (bitcoind_getinfo['errors'],))
+    if bitcoind_getnetworkinfo['warnings'] != '':
+        if 'This is a pre-release test build' not in bitcoind_getnetworkinfo['errors']:
+            res.append('(from bitcoind) %s' % (bitcoind_getnetworkinfo['errors'],))
     
-    version_warning = getattr(net, 'VERSION_WARNING', lambda v: None)(bitcoind_getinfo['version'])
+    version_warning = getattr(net, 'VERSION_WARNING', lambda v: None)(bitcoind_getnetworkinfo['version'])
     if version_warning is not None:
         res.append(version_warning)
     

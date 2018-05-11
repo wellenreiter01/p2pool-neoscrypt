@@ -1,3 +1,6 @@
+
+Version of neoscrypt p2pool for feathercoind versions 0.13 and older
+=======
 Version of p2pool for feathercoind version 0.16
 ------------------------------------------------
 
@@ -5,7 +8,12 @@ Version of p2pool for feathercoind version 0.16
   
   
 Requirements:
--------------------------
+------------------------
+
+
+
+Requirements
+------------
 Generic:
 * Python >=2.6
 * Twisted >=10.0.0
