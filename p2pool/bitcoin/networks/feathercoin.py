@@ -6,13 +6,13 @@ from twisted.internet import defer
 from .. import data, helper
 from p2pool.util import pack
 
-P2P_PREFIX = 'FBC0B6DB'.decode('hex')
+P2P_PREFIX = '41151a21'.decode('hex')
 P2P_PORT = 9336
 ADDRESS_VERSION = 14
 RPC_PORT = 9337
+RPC_CHECK = True
 RPC_CHECK = defer.inlineCallbacks(lambda bitcoind: defer.returnValue(
-  'feathercoinaddress' in (yield bitcoind.rpc_help()) and
-  not (yield bitcoind.rpc_getinfo())['testnet']))
+  'address' in (yield bitcoind.rpc_help()))) 
 SUBSIDY_FUNC = lambda height: 200*100000000 >> (height + 1)//840000
 POW_FUNC = lambda data: pack.IntType(256).unpack(__import__('neoscrypt').getPoWHash(data))
 BLOCK_PERIOD = 60
