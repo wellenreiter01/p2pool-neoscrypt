@@ -5,7 +5,7 @@ from twisted.internet import defer
 
 from .. import data, helper
 from p2pool.util import pack
-P2P_PREFIX = 'DAAFA5BA'.decode('hex')
+P2P_PREFIX = 'AABBCCDD'.decode('hex')
 
 P2P_PORT = 19336
 MIN_TARGET = 0
