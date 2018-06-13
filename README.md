@@ -1,4 +1,4 @@
-Version of neoscrypt p2pool for feathercoind versions 0.13 and older
+Version of neoscrypt p2pool for feathercoind versions 0.16 
 -------------------------
 
 
