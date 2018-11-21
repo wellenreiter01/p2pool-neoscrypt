@@ -9,7 +9,7 @@ P2P_PREFIX = 'DAAFA5BA'.decode('hex')
 
 P2P_PORT = 19336
 MIN_TARGET = 0
-ADDRESS_VERSION = 65
+ADDRESS_VERSION = 111
 RPC_PORT = 19337
 RPC_CHECK = defer.inlineCallbacks(lambda bitcoind: defer.returnValue(
   'feathercoinaddress' in (yield bitcoind.rpc_help()) and (yield bitcoind.rpc_getinfo())['testnet']))
