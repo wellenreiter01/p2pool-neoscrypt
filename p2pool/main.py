@@ -105,7 +105,7 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
         bitcoind_getnetworkinfo_var = variable.Variable(None)
         @defer.inlineCallbacks
         def poll_warnings():
-            bitcoind_getnetworkinfo_var.set((yield deferral.retry('Error1 while calling getinfo:')(bitcoind.rpc_getnetworkinfo)()))
+            bitcoind_getinfo_var.set((yield deferral.retry('Error while calling getinfo:')(bitcoind.rpc_getnetworkinfo)()))
         yield poll_warnings()
         deferral.RobustLoopingCall(poll_warnings).start(20*60)
         
@@ -202,6 +202,12 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
                 if share.hash in node.tracker.verified.items:
                     ss.add_verified_hash(share.hash)
         deferral.RobustLoopingCall(save_shares).start(60)
+
+        if len(shares) > net.CHAIN_LENGTH:
+            best_share = shares[node.best_share_var.value]
+            previous_share = shares[best_share.share_data['previous_share_hash']]
+            counts = p2pool_data.get_desired_version_counts(node.tracker, node.tracker.get_nth_parent_hash(previous_share.hash, net.CHAIN_LENGTH*9//10), net.CHAIN_LENGTH//10)
+            p2pool_data.update_min_protocol_version(counts, best_share)
         
         print '    ...success!'
         print
@@ -282,8 +288,7 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
 	
         
         wb = work.WorkerBridge(node, my_pubkey_hash, args.donation_percentage, merged_urls, args.worker_fee, args, pubkeys, bitcoind)
-        web_root = web.get_web_root(wb, datadir_path, bitcoind_getnetworkinfo_var)
-
+        web_root = web.get_web_root(wb, datadir_path, bitcoind_getinfo_var, static_dir=args.web_static)
         caching_wb = worker_interface.CachingWorkerBridge(wb)
         worker_interface.WorkerInterface(caching_wb).attach_to(web_root, get_handler=lambda request: request.redirect('/static/'))
         web_serverfactory = server.Site(web_root)
@@ -465,6 +470,9 @@ def run():
     parser.add_argument('--logfile',
         help='''log to this file (default: data/<NET>/log)''',
         type=str, action='store', default=None, dest='logfile')
+    parser.add_argument('--web-static',
+        help='use an alternative web frontend in this directory (otherwise use the built-in frontend)',
+        type=str, action='store', default=None, dest='web_static')
     parser.add_argument('--merged',
         help='call getauxblock on this url to get work for merged mining (example: http://ncuser:ncpass@127.0.0.1:10332/)',
         type=str, action='append', default=[], dest='merged_urls')
