@@ -102,7 +102,7 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
         yield helper.check(bitcoind, net)
         temp_work = yield helper.getwork(bitcoind)
         
-        bitcoind_getnetworkinfo_var = variable.Variable(None)
+        bitcoind_getinfo_var = variable.Variable(None)
         @defer.inlineCallbacks
         def poll_warnings():
             bitcoind_getinfo_var.set((yield deferral.retry('Error while calling getinfo:')(bitcoind.rpc_getnetworkinfo)()))
