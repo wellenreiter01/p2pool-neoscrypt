@@ -88,6 +88,7 @@ class Protocol(protocol.Protocol):
         if type_ is None:
             raise ValueError('invalid command')
         #print 'SEND', command, repr(payload2)[:500]
+            raise ValueError('payload2: %r' % (payload2))
         payload = type_.pack(payload2)
         if len(payload) > self._max_payload_length:
             raise TooLong('payload too long')
