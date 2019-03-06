@@ -33,7 +33,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
 
         self.donation_percentage = args.donation_percentage
         self.worker_fee = args.worker_fee
-        self.diff_policy = args.diff_policy                  if args.diff_policy in ['A', 'F'] else 'D'
+     #   self.diff_policy = args.diff_policy                  if args.diff_policy in ['A', 'F'] else 'D'
         
         self.net = self.node.net.PARENT
         self.running = True
@@ -186,9 +186,11 @@ class WorkerBridge(worker_interface.WorkerBridge):
                 except:
                     if p2pool.DEBUG:
                         log.err()
-# ======
-        set_adaptive_target = (self.diff_policy == 'F') or ((self.diff_policy == 'A') and (desired_share_target is None))
-        set_adaptive_pseudo = (self.diff_policy == 'F') or ((self.diff_policy == 'A') and (desired_pseudoshare_target is None))
+# ====== Adaptive behavior is fixed now. back to parameter call?
+   #     set_adaptive_target = (self.diff_policy == 'F') or ((self.diff_policy == 'A') and (desired_share_target is None))
+   #     set_adaptive_pseudo = (self.diff_policy == 'F') or ((self.diff_policy == 'A') and (desired_pseudoshare_target is None))
+        set_adaptive_target = True;
+        set_adaptive_pseudo = True;
         user_rate = None
         pool_rate = None
     
