@@ -56,7 +56,7 @@
         <h2>Traffic rate</h2>
         <svg id="traffic_rate"></svg>
         
-        <h2>Bitcoind GetBlockTemplate Latency</h2>
+        <h2>Feathercoind GetBlockTemplate Latency</h2>
         <svg id="getwork_latency"></svg>
         
         <h2>Memory Usage</h2>
@@ -174,21 +174,9 @@
                     .text('Show/hide table')
                     .on('click', function() { table_div.style.display = table_div.style.display == "block" ? "none" : "block" })
                     .attr("style", "color:blue;text-decoration:underline;cursor:pointer");
-				
-                var currwidth = document.documentElement.clientWidth;
-                var timeOut = null;
-                window.onresize = function(){
-                    if (timeOut != null) 
-                        clearTimeout(timeOut);
-                    timeOut = setTimeout(function(){
-                        if (currwidth != document.documentElement.clientWidth){
-                             window.location.href=window.location.href;
-                        };
-                    currwidth = document.documentElement.clientWidth;
-                    }, 250);
-                }; 
-				
-                var w = currwidth;
+                
+                
+                var w = 700;
                 var h = 300;
                 var margin_v = 40;
                 var margin_h = 180;
@@ -446,13 +434,13 @@
                     plot(d3.select('#local_shares'), 'H/s', 'H', data_to_lines(data), true);
                 });
                 plot_later(d3.select("#payout"), currency_info.symbol, null, [
-                    {"url": "../web/graph_data/current_payout/last_" + lowerperiod, "color": "#0000FF", "label": "Current"}
+                    {"url": "../web/graph_data/current_payout/last_" + lowerperiod, "color": "#0000FF"}
                 ]);
                 d3.json("../web/graph_data/pool_rates/last_" + lowerperiod, function(data) {
                     plot(d3.select('#pool'), 'H/s', 'H', data_to_lines(data), true);
                 });
                 d3.json("../web/graph_data/peers/last_" + lowerperiod, function(data) {
-                    plot(d3.select('#peers'), 'Total', null, data_to_lines(data, function(line){ return line.label == "incoming" }), true);
+                    plot(d3.select('#peers'), '', null, data_to_lines(data, function(line){ return line.label == "incoming" }), true);
                 });
                 
                 d3.json("../web/graph_data/miner_hash_rates/last_" + lowerperiod, function(data) {
@@ -472,7 +460,7 @@
                             });
                             div.append("svg:svg").each(function(u) {
                                 plot(d3.select(this), currency_info.symbol, null, [
-                                    {"data": current_payouts.map(function(d){ return [d[0], u in d[1] ? d[1][u] : d[3], d[2]] }), "color": "#0000FF", "label": "Current"}
+                                    {"data": current_payouts.map(function(d){ return [d[0], u in d[1] ? d[1][u] : d[3], d[2]] }), "color": "#0000FF"}
                                 ]);
                             });
                         });

@@ -80,11 +80,11 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
         @defer.inlineCallbacks
         def connect_p2p():
             # connect to bitcoind over bitcoin-p2p
-            print '''Testing bitcoind P2P connection to '%s:%s'...''' % (args.bitcoind_address, args.bitcoind_p2p_port)
+            print '''Testing coin daemon P2P connection to '%s:%s'...''' % (args.bitcoind_address, args.bitcoind_p2p_port)
             factory = bitcoin_p2p.ClientFactory(net.PARENT)
             reactor.connectTCP(args.bitcoind_address, args.bitcoind_p2p_port, factory)
             def long():
-                print '''    ...taking a while. Common reasons for this include all of bitcoind's connection slots being used...'''
+                print '''    ...taking a while. Common reasons for this include all of daemon's connection slots being used...'''
             long_dc = reactor.callLater(5, long)
             yield factory.getProtocol() # waits until handshake is successful
             if not long_dc.called: long_dc.cancel()
@@ -97,15 +97,16 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
         
         # connect to bitcoind over JSON-RPC and do initial getmemorypool
         url = '%s://%s:%i/' % ('https' if args.bitcoind_rpc_ssl else 'http', args.bitcoind_address, args.bitcoind_rpc_port)
-        print '''Testing bitcoind RPC connection to '%s' with username '%s'...''' % (url, args.bitcoind_rpc_username)
+        print '''Testing daemon RPC connection to '%s' with username '%s'...''' % (url, args.bitcoind_rpc_username)
         bitcoind = jsonrpc.HTTPProxy(url, dict(Authorization='Basic ' + base64.b64encode(args.bitcoind_rpc_username + ':' + args.bitcoind_rpc_password)), timeout=30)
         yield helper.check(bitcoind, net)
         temp_work = yield helper.getwork(bitcoind)
         
-        bitcoind_getinfo_var = variable.Variable(None)
+        bitcoind_getnetworkinfo_var = variable.Variable(None)
         @defer.inlineCallbacks
         def poll_warnings():
-            bitcoind_getinfo_var.set((yield deferral.retry('Error while calling getinfo:')(bitcoind.rpc_getnetworkinfo)()))
+            bitcoind_getnetworkinfo_var.set((yield deferral.retry('Error1 while calling getinfo:')(bitcoind.rpc_getnetworkinfo)()))
+
         yield poll_warnings()
         deferral.RobustLoopingCall(poll_warnings).start(20*60)
         
@@ -132,12 +133,12 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
             if address is not None:
                 res = yield deferral.retry('Error validating cached address:', 5)(lambda: bitcoind.rpc_validateaddress(address))()
                 if not res['isvalid'] or not res['ismine']:
-                    print '    Cached address is either invalid or not controlled by local bitcoind!'
+                    print '    Cached address is either invalid or not controlled by local daemon!'
                     address = None
             
             if address is None:
-                print '    Getting payout address from bitcoind...'
-                address = yield deferral.retry('Error getting payout address from bitcoind:', 5)(lambda: bitcoind.rpc_getaccountaddress('p2pool'))()
+                print '    Getting payout address from daemon...'
+                address = yield deferral.retry('Error getting payout address from daemon:', 5)(lambda: bitcoind.rpc_getaccountaddress('p2pool'))()
             
             with open(address_path, 'wb') as f:
                 f.write(address)
@@ -158,7 +159,7 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
                 print ' ERROR: Can not use fewer than 2 addresses in dynamic mode. Resetting to 2.'
                 args.numaddresses = 2
             for i in range(args.numaddresses):
-                address = yield deferral.retry('Error getting a dynamic address from bitcoind:', 5)(lambda: bitcoind.rpc_getnewaddress('p2pool'))()
+                address = yield deferral.retry('Error getting a dynamic address from daemon:', 5)(lambda: bitcoind.rpc_getnewaddress('p2pool'))()
                 new_pubkey = bitcoin_data.address_to_pubkey_hash(address, net.PARENT)
                 pubkeys.addkey(new_pubkey)
 
@@ -284,9 +285,16 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
         # start listening for workers with a JSON-RPC server
         
         print 'Listening for workers on %r port %i...' % (worker_endpoint[0], worker_endpoint[1])
+
+	
         
         wb = work.WorkerBridge(node, my_pubkey_hash, args.donation_percentage, merged_urls, args.worker_fee, args, pubkeys, bitcoind)
-        web_root = web.get_web_root(wb, datadir_path, bitcoind_getinfo_var, static_dir=args.web_static)
+#<<<<<<< HEAD
+#        web_root = web.get_web_root(wb, datadir_path, bitcoind_getinfo_var, static_dir=args.web_static)
+#=======
+        web_root = web.get_web_root(wb, datadir_path, bitcoind_getnetworkinfo_var)
+
+#>>>>>>> feathercoind_0.16
         caching_wb = worker_interface.CachingWorkerBridge(wb)
         worker_interface.WorkerInterface(caching_wb).attach_to(web_root, get_handler=lambda request: request.redirect('/static/'))
         web_serverfactory = server.Site(web_root)
@@ -415,7 +423,7 @@ def main(args, net, datadir_path, merged_urls, worker_endpoint):
                             math.format_dt(2**256 / node.bitcoind_work.value['bits'].target / real_att_s),
                         )
                         
-                        for warning in p2pool_data.get_warnings(node.tracker, node.best_share_var.value, net, bitcoind_getinfo_var.value, node.bitcoind_work.value):
+                        for warning in p2pool_data.get_warnings(node.tracker, node.best_share_var.value, net, bitcoind_getnetworkinfo_var.value, node.bitcoind_work.value):
                             print >>sys.stderr, '#'*40
                             print >>sys.stderr, '>>> Warning: ' + warning
                             print >>sys.stderr, '#'*40
@@ -454,7 +462,7 @@ def run():
         help='enable debugging mode',
         action='store_const', const=True, default=False, dest='debug')
     parser.add_argument('-a', '--address',
-        help='generate payouts to this address (default: <address requested from bitcoind>), or (dynamic)',
+        help='generate payouts to this address (default: <address requested from daemon>), or (dynamic)',
         type=str, action='store', default=None, dest='address')
     parser.add_argument('-i', '--numaddresses',
         help='number of bitcoin auto-generated addresses to maintain for getwork dynamic address allocation',
@@ -517,7 +525,10 @@ def run():
     worker_group.add_argument('-f', '--fee', metavar='FEE_PERCENTAGE',
         help='''charge workers mining to their own bitcoin address (by setting their miner's username to a bitcoin address) this percentage fee to mine on your p2pool instance. Amount displayed at http://127.0.0.1:WORKER_PORT/fee (default: 0)''',
         type=float, action='store', default=0, dest='worker_fee')
-    
+    worker_group.add_argument('-d', '--difficulty', metavar='DIFFICULTY',
+        help='''set difficulty policy: D - default, A - adaptive, F - force adaptive (ignore miner's request)''',
+        type=str, action='store', default='D', dest='diff_policy')    
+
     bitcoind_group = parser.add_argument_group('bitcoind interface')
     bitcoind_group.add_argument('--bitcoind-config-path', metavar='BITCOIND_CONFIG_PATH',
         help='custom configuration file path (when bitcoind -conf option used)',

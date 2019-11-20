@@ -248,7 +248,7 @@ class Node(object):
                 new_known_txs[tx_hash] = tx
             self.mining_txs_var.set(new_mining_txs)
             self.known_txs_var.set(new_known_txs)
-        # add p2p transactions from bitcoind to known_txs
+        # add p2p transactions from daemon to known_txs
         @self.factory.new_tx.watch
         def _(tx):
             new_known_txs = dict(self.known_txs_var.value)

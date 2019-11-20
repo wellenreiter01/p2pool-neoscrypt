@@ -33,6 +33,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
 
         self.donation_percentage = args.donation_percentage
         self.worker_fee = args.worker_fee
+        self.diff_policy = args.diff_policy                  if args.diff_policy in ['A', 'F'] else 'D'
         
         self.net = self.node.net.PARENT
         self.running = True
@@ -107,7 +108,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
                     bits=bb['bits'], # not always true
                     coinbaseflags='',
                     height=t['height'] + 1,
-                    time=bb['timestamp'] + 600, # better way?
+                    time=bb['timestamp'] + self.node.net.PARENT.BLOCK_PERIOD, # better way?
                     transactions=[],
                     transaction_fees=[],
                     merkle_link=bitcoin_data.calculate_merkle_link([None], 0),
@@ -154,7 +155,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
             return
         self.address_throttle=time.time()
         print "ATTEMPTING TO FRESHEN ADDRESS."
-        self.address = yield deferral.retry('Error getting a dynamic address from bitcoind:', 5)(lambda: self.bitcoind.rpc_getnewaddress('p2pool'))()
+        self.address = yield deferral.retry('Error getting a dynamic address from daemon:', 5)(lambda: self.bitcoind.rpc_getnewaddress('p2pool'))()
         new_pubkey = bitcoin_data.address_to_pubkey_hash(self.address, self.net)
         self.pubkeys.popleft()
         self.pubkeys.addkey(new_pubkey)
@@ -186,6 +187,45 @@ class WorkerBridge(worker_interface.WorkerBridge):
                     if p2pool.DEBUG:
                         log.err()
 
+	# ====== Adaptive
+
+        set_adaptive_target = (self.diff_policy == 'F') or ((self.diff_policy == 'A') and (desired_share_target is None))
+        set_adaptive_pseudo = (self.diff_policy == 'F') or ((self.diff_policy == 'A') and (desired_pseudoshare_target is None))
+
+
+        user_rate = None
+        pool_rate = None
+    
+        if set_adaptive_target: # calculate pool hashrate
+            height = self.node.tracker.get_height(self.node.best_share_var.value)
+            if height > 5: # we want at least 6 shares in chain
+                stale_prop = p2pool_data.get_average_stale_prop(self.node.tracker, self.node.best_share_var.value, min(60*60//self.node.net.SHARE_PERIOD, height))
+                pool_rate = p2pool_data.get_pool_attempts_per_second(self.node.tracker, self.node.best_share_var.value, min(height - 1, 60*60//self.node.net.SHARE_PERIOD)) / (1 - stale_prop)
+    
+        if set_adaptive_pseudo or set_adaptive_target: # calculate user's hashrate
+            datums, dt = self.local_rate_monitor.get_datums_in_last()
+            npoints = sum(datum['user'] == user for datum in datums)
+            if npoints > 5: # at least 6 hashrate datums for the user
+                user_rate = 0
+                for datum in datums:
+                    if datum['user'] == user:
+                        user_rate += datum['work']/dt
+    
+        if set_adaptive_target:
+            desired_share_target = None
+            if user_rate is not None and pool_rate is not None:
+                if user_rate and pool_rate:
+                     # min 20 shares per block AND min 20 shares per chain
+                    desired_share_target = int(20 * (max(self.node.bitcoind_work.value['bits'].target * pool_rate, 2**256 // (self.node.net.CHAIN_LENGTH * self.node.net.SHARE_PERIOD)) // user_rate))
+    
+        if set_adaptive_pseudo:
+            desired_pseudoshare_target = None
+            if user_rate is not None:
+                if user_rate:
+                    desired_pseudoshare_target = int(20 * (2**256 // user_rate // (10*60))) # min 100 pseudoshares per 10 minutes
+
+# ====== /adaptive
+
         if self.args.address == 'dynamic':
             i = self.pubkeys.weighted()
             pubkey_hash = self.pubkeys.keys[i]
@@ -209,7 +249,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
         if (self.node.p2p_node is None or len(self.node.p2p_node.peers) == 0) and self.node.net.PERSIST:
             raise jsonrpc.Error_for_code(-12345)(u'p2pool is not connected to any peers')
         if time.time() > self.current_work.value['last_update'] + 60:
-            raise jsonrpc.Error_for_code(-12345)(u'lost contact with bitcoind')
+            raise jsonrpc.Error_for_code(-12345)(u'lost contact with coin daemon')
         user, pubkey_hash, desired_share_target, desired_pseudoshare_target = self.get_user_details(user)
         return pubkey_hash, desired_share_target, desired_pseudoshare_target
     
